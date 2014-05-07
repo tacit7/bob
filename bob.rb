@@ -1,5 +1,8 @@
+# This is bob
+# Bob can answer to silence, a question, yelling, and neutral sentence
 class Bob
   RESPONSES = [:silence, :question, :yelling, :neutral]
+
   def hey(statement)
     @statement = statement and bobs_response
   end
@@ -27,28 +30,31 @@ class Bob
     end
 end
 
+# Abstracting responses in case more complex responses emerge in the future.
 class Response
   RESPONSES = { silence:  'Fine. Be that way!', question: 'Sure.',
                 yelling:  'Woah, chill out!',   neutral:  'Whatever.' }
+
   def self.to(statement)
     RESPONSES[statement]
   end
 end
 
 class Statement
-
   def initialize(statement)
     @statement = statement.gsub '?', ' ?'
-    # add space so words dont stick to the '?'. We need 'hello ?' not 'hello?'
+    # Add space before a '?' so words wont stick to the '?'.
+    # We need 'hello ?' not 'hello?'
   end
 
+  # List the types for the statement
   def types
     types = []
-    push_if_type = ->(type, method) { types.push(type) if send(method); types}
-    push_if_type[:question, :question?]
-    push_if_type[:yelling,  :yelling?]
-    push_if_type[:silence,  :silence?]
-    push_if_type[:neutral,  :neutral?]
+    push_if = ->(method, type) { types.push(type) if send(method); types}
+    push_if[:question?, :question]
+    push_if[:yelling?,  :yelling]
+    push_if[:silence?,  :silence]
+    push_if[:neutral?,  :neutral]
   end
 
   def question?
@@ -56,10 +62,11 @@ class Statement
   end
 
   def yelling?
-    all_caps?
+    all_caps? # For this assignment, yelling is when a statement is in all caps
   end
 
   def silence?
+    # if you have any letter, its not silence
     !(@statement.count('a-zA-Z0-9') > 0)
   end
 
